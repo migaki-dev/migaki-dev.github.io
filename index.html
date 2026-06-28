@@ -10,6 +10,11 @@
     <meta name="color-scheme" content="light dark" />
     <title>Migaki</title>
     <link rel="icon" href="data:," />
+    <link
+      rel="stylesheet"
+      href="https://cdn.jsdelivr.net/npm/katex@0.16.22/dist/katex.min.css"
+      crossorigin="anonymous"
+    />
     <link rel="stylesheet" href="styles.css" />
     <script>
       const savedTheme = localStorage.getItem("migaki-theme");
@@ -26,6 +31,7 @@
 
       <nav class="site-nav" aria-label="Primary navigation">
         <a href="#map">Map</a>
+        <a href="#whitepaper">Whitepaper</a>
         <a href="#author">Author</a>
         <a href="https://github.com/migaki-dev/migaki">GitHub</a>
       </nav>
@@ -50,7 +56,7 @@
           </p>
           <div class="actions" aria-label="Primary links">
             <a class="button primary" href="https://github.com/migaki-dev/migaki">Repository</a>
-            <a class="button" href="https://github.com/migaki-dev/migaki-whitepaper">Whitepaper</a>
+            <a class="button" href="#whitepaper">Whitepaper</a>
           </div>
         </div>
 
@@ -93,12 +99,37 @@
             <span>Implementation tasks, design follow-ups, defects, and milestone planning.</span>
           </a>
 
-          <a class="link-card" href="https://github.com/migaki-dev/migaki-whitepaper">
+          <a class="link-card" href="#whitepaper">
             <span class="card-kicker">Paper</span>
             <strong>Whitepaper</strong>
-            <span>The longer-form technical framing for Migaki's execution model.</span>
+            <span>Read the rendered paper, with links to the source repository and PDF.</span>
           </a>
         </div>
+      </section>
+
+      <section class="whitepaper-preview" id="whitepaper" aria-labelledby="whitepaper-title">
+        <div class="whitepaper-heading">
+          <p class="eyebrow">Whitepaper</p>
+          <h2 id="whitepaper-title">Rendered from the whitepaper source.</h2>
+          <p class="whitepaper-text">
+            This page loads the LaTeX source from the sibling
+            <code>migaki-dev/migaki-whitepaper</code> repository and renders the
+            paper in-browser with KaTeX.
+          </p>
+          <div class="actions" aria-label="Whitepaper links">
+            <a class="button primary" href="https://github.com/migaki-dev/migaki-whitepaper">Source</a>
+            <a class="button" href="https://github.com/migaki-dev/migaki-whitepaper/blob/main/dist/migaki-whitepaper.pdf">PDF</a>
+          </div>
+        </div>
+
+        <article class="whitepaper-reader" aria-live="polite" aria-busy="true">
+          <div class="paper-meta">
+            <span>Source: migaki-dev/migaki-whitepaper</span>
+            <span>Renderer: KaTeX 0.16.22</span>
+          </div>
+          <p class="paper-status" id="whitepaper-status">Loading whitepaper source...</p>
+          <div class="paper-document" id="whitepaper-document"></div>
+        </article>
       </section>
 
       <section class="author" id="author" aria-labelledby="author-title">
@@ -116,5 +147,6 @@
     </footer>
 
     <script src="theme.js"></script>
+    <script type="module" src="whitepaper.js"></script>
   </body>
 </html>

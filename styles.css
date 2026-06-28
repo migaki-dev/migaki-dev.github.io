@@ -56,6 +56,7 @@
 html {
   background: var(--bg);
   color: var(--ink);
+  overflow-x: clip;
   scroll-behavior: smooth;
 }
 
@@ -66,6 +67,7 @@ body {
   color: var(--ink);
   font-size: 16px;
   line-height: 1.6;
+  overflow-x: clip;
 }
 
 a {
@@ -364,6 +366,207 @@ figcaption {
   color: var(--muted);
 }
 
+.whitepaper-preview {
+  padding: 60px 0 68px;
+  border-top: 1px solid var(--border);
+}
+
+.whitepaper-heading {
+  max-width: 860px;
+  margin-bottom: 28px;
+}
+
+.whitepaper-text {
+  max-width: 620px;
+  margin-bottom: 0;
+  color: var(--muted);
+  font-size: clamp(1rem, 1.6vw, 1.16rem);
+}
+
+.whitepaper-text code {
+  font-size: 0.94em;
+}
+
+.whitepaper-reader {
+  padding: clamp(20px, 4vw, 40px);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  background:
+    linear-gradient(145deg, color-mix(in srgb, var(--surface), transparent 2%), color-mix(in srgb, var(--surface-strong), transparent 12%)),
+    var(--surface);
+  color: var(--ink);
+  box-shadow: var(--shadow);
+}
+
+.paper-meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px 18px;
+  justify-content: space-between;
+  margin-bottom: 28px;
+  color: var(--muted);
+  font-size: 0.82rem;
+}
+
+.paper-status {
+  margin: 0;
+  color: var(--muted);
+}
+
+.paper-document {
+  display: grid;
+  gap: 18px;
+  min-width: 0;
+}
+
+.paper-document > * {
+  min-width: 0;
+}
+
+.paper-document:empty {
+  display: none;
+}
+
+.paper-document h3,
+.paper-document h4 {
+  max-width: 820px;
+  margin: 34px 0 0;
+  letter-spacing: 0;
+}
+
+.paper-document h3:first-child {
+  margin-top: 0;
+}
+
+.paper-document h3 {
+  font-size: clamp(1.55rem, 3vw, 2.35rem);
+  line-height: 1.08;
+}
+
+.paper-document h4 {
+  font-size: 1.22rem;
+  line-height: 1.2;
+}
+
+.paper-document p,
+.paper-document li,
+.paper-document blockquote,
+.paper-document pre,
+.paper-document table,
+.paper-table-scroll {
+  max-width: 860px;
+}
+
+.paper-document p,
+.paper-document ul,
+.paper-document blockquote,
+.paper-document pre,
+.paper-document table,
+.paper-table-scroll {
+  margin: 0;
+}
+
+.paper-document ul {
+  display: grid;
+  gap: 8px;
+  padding-left: 1.2rem;
+}
+
+.paper-document blockquote,
+.paper-theorem,
+.paper-center {
+  max-width: 860px;
+  margin: 0;
+  padding: 16px 18px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  background: color-mix(in srgb, var(--surface-strong), transparent 38%);
+}
+
+.paper-theorem-title {
+  display: block;
+  margin-bottom: 8px;
+  color: var(--accent);
+  font-size: 0.8rem;
+  font-weight: 760;
+  text-transform: uppercase;
+}
+
+.paper-center {
+  display: grid;
+  gap: 6px;
+  justify-items: center;
+  text-align: center;
+}
+
+.paper-document pre {
+  overflow-x: auto;
+  padding: 16px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  background: color-mix(in srgb, var(--surface-strong), transparent 24%);
+  color: var(--ink);
+  font-size: 0.9rem;
+  line-height: 1.5;
+}
+
+.paper-table-scroll {
+  width: 100%;
+  overflow-x: auto;
+}
+
+.paper-document table {
+  width: 100%;
+  border-collapse: collapse;
+  overflow: hidden;
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  font-size: 0.93rem;
+}
+
+.paper-document th,
+.paper-document td {
+  padding: 10px 12px;
+  border-bottom: 1px solid var(--border);
+  text-align: left;
+  vertical-align: top;
+}
+
+.paper-document tr:last-child th,
+.paper-document tr:last-child td {
+  border-bottom: 0;
+}
+
+.paper-document th {
+  color: var(--accent);
+  font-weight: 760;
+}
+
+.paper-caption,
+.paper-citation {
+  color: var(--muted);
+}
+
+.paper-caption {
+  margin-top: -8px;
+  font-size: 0.9rem;
+}
+
+.paper-equation {
+  width: 100%;
+  max-width: 100%;
+  overflow-x: auto;
+  overflow-y: hidden;
+  padding: 4px 0;
+}
+
+.katex-display {
+  max-width: 100%;
+  margin: 0;
+  overflow-x: auto;
+  overflow-y: hidden;
+}
+
 .author {
   display: flex;
   gap: 24px;
@@ -482,6 +685,24 @@ figcaption {
 
   .link-card {
     min-height: 184px;
+  }
+
+  .whitepaper-preview {
+    padding: 34px 0 42px;
+  }
+
+  .whitepaper-reader {
+    padding: 16px;
+  }
+
+  .paper-document {
+    gap: 16px;
+  }
+
+  .paper-document table {
+    width: max-content;
+    min-width: 100%;
+    white-space: nowrap;
   }
 
   .author {
