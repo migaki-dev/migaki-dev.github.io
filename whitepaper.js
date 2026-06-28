@@ -1,30 +1,8 @@
-const KATEX_URL = "https://cdn.jsdelivr.net/npm/katex@0.16.22/dist/katex.mjs";
+const KATEX_VERSION = "0.17.0";
+const KATEX_URL = `https://cdn.jsdelivr.net/npm/katex@${KATEX_VERSION}/dist/katex.mjs`;
 const WHITEPAPER_BASE =
   "https://raw.githubusercontent.com/migaki-dev/migaki-whitepaper/main/paper/";
-
-const WHITEPAPER_SECTIONS = [
-  "sections/00-abstract.tex",
-  "sections/01-introduction.tex",
-  "sections/02-the-missing-middle.tex",
-  "sections/03-position-within-the-ecosystem.tex",
-  "sections/04-from-compiler-analogy-to-probabilistic-query-optimization.tex",
-  "sections/05-formal-model.tex",
-  "sections/06-mir-migaki-intermediate-representation.tex",
-  "sections/07-context-selection-and-deduplication.tex",
-  "sections/08-cache-planning.tex",
-  "sections/09-routing-under-constraints.tex",
-  "sections/10-provider-neutral-capability-aware.tex",
-  "sections/11-optimization-passes.tex",
-  "sections/12-verification-and-evidence.tex",
-  "sections/13-examples.tex",
-  "sections/14-initial-scope.tex",
-  "sections/15-why-now.tex",
-  "sections/16-long-term-vision.tex",
-  "sections/17-conclusion.tex",
-  "sections/a1-one-sentence-positioning.tex",
-  "sections/a2-claims-migaki-can-defend.tex",
-  "sections/a3-claims-migaki-should-avoid.tex",
-];
+const WHITEPAPER_MAIN_PATH = "main.tex";
 
 const KATEX_MACROS = {
   "\\Accept": "\\mathsf{Accept}",
@@ -48,6 +26,10 @@ const KATEX_MACROS = {
 const statusElement = document.getElementById("whitepaper-status");
 const documentElement = document.getElementById("whitepaper-document");
 const readerElement = document.querySelector(".whitepaper-reader");
+const katexVersionElement = document.querySelector("[data-katex-version]");
+
+let referenceIndex = new Map();
+let paginationTimer = 0;
 
 async function main() {
   if (!statusElement || !documentElement) {
@@ -55,19 +37,42 @@ async function main() {
   }
 
   try {
-    const [{ default: katex }, sectionTexts] = await Promise.all([
+    if (katexVersionElement) {
+      katexVersionElement.textContent = `KaTeX ${KATEX_VERSION}`;
+    }
+
+    const [{ default: katex }, mainText] = await Promise.all([
       import(KATEX_URL),
-      Promise.all(WHITEPAPER_SECTIONS.map(fetchSection)),
+      fetchSource(WHITEPAPER_MAIN_PATH),
     ]);
+    const inputPaths = extractInputPaths(mainText);
+    const sectionPaths = inputPaths.filter((path) => path.startsWith("sections/"));
+    const bibliographyPath = inputPaths.find((path) => path === "bibliography.tex");
+    const [sectionTexts, bibliographyText] = await Promise.all([
+      Promise.all(sectionPaths.map(fetchSource)),
+      bibliographyPath ? fetchSource(bibliographyPath) : Promise.resolve(""),
+    ]);
+    const references = extractBibliographyEntries(bibliographyText);
+    referenceIndex = new Map(
+      references.map((entry, index) => [entry.key, { ...entry, number: index + 1 }]),
+    );
 
     const fragment = document.createDocumentFragment();
-    addPaperTitle(fragment);
+    addPaperTitle(fragment, extractPaperMetadata(mainText));
 
     for (const sectionText of sectionTexts) {
       fragment.append(renderLatexDocument(sectionText, katex));
     }
 
+    if (references.length > 0) {
+      fragment.append(renderBibliography(references, katex));
+    }
+
     documentElement.replaceChildren(fragment);
+    await document.fonts?.ready;
+    await nextFrame();
+    paginateDocument(documentElement);
+    window.addEventListener("resize", schedulePagination, { passive: true });
     statusElement.remove();
     readerElement?.setAttribute("aria-busy", "false");
   } catch (error) {
@@ -78,7 +83,7 @@ async function main() {
   }
 }
 
-async function fetchSection(path) {
+async function fetchSource(path) {
   const response = await fetch(`${WHITEPAPER_BASE}${path}`);
   if (!response.ok) {
     throw new Error(`Failed to fetch ${path}: ${response.status}`);
@@ -87,15 +92,112 @@ async function fetchSection(path) {
   return response.text();
 }
 
-function addPaperTitle(fragment) {
-  const title = document.createElement("h3");
-  title.textContent = "Migaki: Toward an Execution Optimizer for Agentic Systems";
-  fragment.append(title);
+function extractInputPaths(source) {
+  return Array.from(source.matchAll(/\\input\{([^}]+)\}/g), (match) =>
+    normalizeTexPath(match[1]),
+  ).filter((path) => path !== "preamble.tex");
+}
 
-  const meta = document.createElement("p");
-  meta.className = "paper-caption";
-  meta.textContent = "Draft Vision Paper v0.3. Aleksandr Lopashev, Migaki Project.";
-  fragment.append(meta);
+function normalizeTexPath(path) {
+  return path.endsWith(".tex") ? path : `${path}.tex`;
+}
+
+function extractPaperMetadata(source) {
+  const titleLines = splitLatexLines(extractCommandArgument(source, "title") ?? "")
+    .map(cleanPlainLatexText)
+    .filter(Boolean);
+  const authorLines = splitLatexLines(extractCommandArgument(source, "author") ?? "")
+    .map(cleanPlainLatexText)
+    .filter(Boolean);
+  const date = cleanPlainLatexText(extractCommandArgument(source, "date") ?? "");
+
+  return {
+    title: titleLines[0] || "Whitepaper",
+    subtitle: titleLines.slice(1).join(" "),
+    authors: authorLines,
+    date,
+  };
+}
+
+function extractCommandArgument(source, command) {
+  const commandIndex = source.indexOf(`\\${command}`);
+  if (commandIndex === -1) {
+    return "";
+  }
+
+  const start = source.indexOf("{", commandIndex);
+  if (start === -1) {
+    return "";
+  }
+
+  let depth = 0;
+  let escaped = false;
+  for (let index = start; index < source.length; index += 1) {
+    const char = source[index];
+    if (char === "\\" && !escaped) {
+      escaped = true;
+      continue;
+    }
+
+    if (char === "{" && !escaped) {
+      depth += 1;
+    }
+
+    if (char === "}" && !escaped) {
+      depth -= 1;
+      if (depth === 0) {
+        return source.slice(start + 1, index);
+      }
+    }
+
+    escaped = false;
+  }
+
+  return "";
+}
+
+function splitLatexLines(source) {
+  return source.replace(/\\vspace\{[^}]+\}/g, "").split(/\\\\(?:\[[^\]]+\])?/);
+}
+
+function cleanPlainLatexText(source) {
+  return source
+    .replace(/\\(?:textbf|emph|texttt|textsc)\{([^{}]*)\}/g, "$1")
+    .replace(/\\(?:small|large)\b/g, "")
+    .replace(/\\migaki\{\}|\\migaki/g, "Migaki")
+    .replace(/\\mir\{\}|\\mir/g, "mIR")
+    .replace(/``/g, "\"")
+    .replace(/''/g, "\"")
+    .replace(/---/g, "-")
+    .replace(/~+/g, " ")
+    .replace(/\s+/g, " ")
+    .trim();
+}
+
+function addPaperTitle(fragment, metadata) {
+  const header = document.createElement("header");
+  header.className = "paper-title-page";
+
+  const title = document.createElement("h3");
+  title.className = "paper-title";
+  title.textContent = metadata.title;
+  header.append(title);
+
+  if (metadata.subtitle) {
+    const subtitle = document.createElement("p");
+    subtitle.className = "paper-subtitle";
+    subtitle.textContent = metadata.subtitle;
+    header.append(subtitle);
+  }
+
+  if (metadata.authors.length > 0 || metadata.date) {
+    const meta = document.createElement("p");
+    meta.className = "paper-byline";
+    meta.textContent = [...metadata.authors, metadata.date].filter(Boolean).join(" · ");
+    header.append(meta);
+  }
+
+  fragment.append(header);
 }
 
 function renderLatexDocument(source, katex) {
@@ -217,6 +319,12 @@ function renderMathBlock(content, katex, aligned) {
 
   if (aligned) {
     math = `\\begin{aligned}\n${math}\n\\end{aligned}`;
+  } else {
+    math = normalizeDisplayMath(math);
+  }
+
+  if (math.length > 120) {
+    wrapper.classList.add("paper-equation-long");
   }
 
   wrapper.innerHTML = katex.renderToString(math, {
@@ -225,6 +333,24 @@ function renderMathBlock(content, katex, aligned) {
     throwOnError: false,
   });
   return wrapper;
+}
+
+function normalizeDisplayMath(math) {
+  const typeSet = math.match(/^\\tau\(v\)\s*\\in\s*\\\{(.+)\\\}\.$/s);
+  if (!typeSet) {
+    return math;
+  }
+
+  const items = typeSet[1].split(/\s*,\s*/).filter(Boolean);
+  if (items.length < 7) {
+    return math;
+  }
+
+  const splitIndex = Math.ceil(items.length / 2);
+  return `\\begin{aligned}
+\\tau(v) \\in \\{&${items.slice(0, splitIndex).join(", ")},\\\\
+&${items.slice(splitIndex).join(", ")}\\}.
+\\end{aligned}`;
 }
 
 function renderItemize(content, katex) {
@@ -372,19 +498,99 @@ function appendInline(parent, source, katex) {
 }
 
 function appendFormattedText(parent, source) {
-  const html = cleanupText(source)
+  const html = cleanupInlineText(source)
     .replace(/\\href\{(https?:\/\/[^}]+)\}\{([^}]+)\}/g, '<a href="$1">$2</a>')
     .replace(/\\url\{(https?:\/\/[^}]+)\}/g, '<a href="$1">$1</a>')
     .replace(/\\textbf\{([^}]+)\}/g, "<strong>$1</strong>")
     .replace(/\\emph\{([^}]+)\}/g, "<em>$1</em>")
     .replace(/\\texttt\{([^}]+)\}/g, "<code>$1</code>")
     .replace(/\\textsc\{([^}]+)\}/g, "<span>$1</span>")
-    .replace(/\\citep\{([^}]+)\}/g, '<span class="paper-citation">[$1]</span>')
-    .replace(/\\cite\{([^}]+)\}/g, '<span class="paper-citation">[$1]</span>');
+    .replace(/\\citep?\{([^}]+)\}/g, (_match, keys) => renderCitationHtml(keys));
 
   const template = document.createElement("template");
   template.innerHTML = html;
   parent.append(template.content);
+}
+
+function renderCitationHtml(keys) {
+  const citations = keys
+    .split(",")
+    .map((key) => key.trim())
+    .filter(Boolean)
+    .map((key) => {
+      const reference = referenceIndex.get(key);
+      if (!reference) {
+        return escapeHtml(key);
+      }
+
+      return `<a href="#${referenceId(key)}">${reference.number}</a>`;
+    });
+
+  return `<span class="paper-citation">[${citations.join(", ")}]</span>`;
+}
+
+function renderBibliography(entries, katex) {
+  const fragment = document.createDocumentFragment();
+
+  const heading = document.createElement("h3");
+  heading.textContent = "References";
+  fragment.append(heading);
+
+  for (const [index, entry] of entries.entries()) {
+    const item = document.createElement("p");
+    item.className = "paper-reference";
+    item.id = referenceId(entry.key);
+
+    const label = document.createElement("span");
+    label.className = "paper-reference-number";
+    label.textContent = `[${index + 1}]`;
+    item.append(label);
+
+    const body = document.createElement("span");
+    appendInline(body, entry.body, katex);
+    item.append(body);
+    fragment.append(item);
+  }
+
+  return fragment;
+}
+
+function extractBibliographyEntries(source) {
+  const text = stripComments(source)
+    .replace(/\\begin\{thebibliography\}\{[^}]+\}/g, "")
+    .replace(/\\end\{thebibliography\}/g, "");
+  const entries = [];
+  const pattern = /\\bibitem\{([^}]+)\}/g;
+  let match = pattern.exec(text);
+
+  while (match) {
+    const bodyStart = pattern.lastIndex;
+    const nextMatch = pattern.exec(text);
+    const body = text.slice(bodyStart, nextMatch ? nextMatch.index : text.length);
+    entries.push({
+      key: match[1],
+      body: body.replace(/\s+/g, " ").trim(),
+    });
+    match = nextMatch;
+  }
+
+  return entries;
+}
+
+function referenceId(key) {
+  return `ref-${key.replace(/[^a-z0-9_-]+/gi, "-")}`;
+}
+
+function cleanupInlineText(source) {
+  const leading = /^\s/.test(source) ? " " : "";
+  const trailing = /\s$/.test(source) ? " " : "";
+  const cleaned = cleanupText(source);
+
+  if (!cleaned) {
+    return leading || trailing ? " " : "";
+  }
+
+  return `${leading}${cleaned}${trailing}`;
 }
 
 function cleanupText(source) {
@@ -399,7 +605,9 @@ function cleanupText(source) {
     .replace(/``/g, "\"")
     .replace(/''/g, "\"")
     .replace(/---/g, "-")
+    .replace(/\\LaTeX/g, "LaTeX")
     .replace(/\\ldots/g, "...")
+    .replace(/\\_/g, "_")
     .replace(/\\%/g, "%")
     .replace(/\\&/g, "&")
     .replace(/\s+/g, " ")
@@ -441,6 +649,93 @@ function escapeHtml(source) {
 
 function capitalize(source) {
   return source.charAt(0).toUpperCase() + source.slice(1);
+}
+
+function schedulePagination() {
+  window.clearTimeout(paginationTimer);
+  paginationTimer = window.setTimeout(() => paginateDocument(documentElement), 140);
+}
+
+function paginateDocument(root) {
+  const nodes = collectPaperNodes(root);
+  if (nodes.length === 0) {
+    return;
+  }
+
+  const pages = document.createElement("div");
+  pages.className = "paper-pages";
+  root.replaceChildren(pages);
+
+  let pageNumber = 1;
+  let current = createPaperPage(pages, pageNumber);
+
+  for (const node of nodes) {
+    current.flow.append(node);
+
+    if (current.page.scrollHeight <= current.page.clientHeight + 2) {
+      continue;
+    }
+
+    if (current.flow.children.length === 1) {
+      current.page.classList.add("paper-page--overflow");
+      pageNumber += 1;
+      current = createPaperPage(pages, pageNumber);
+      continue;
+    }
+
+    current.flow.removeChild(node);
+    pageNumber += 1;
+    current = createPaperPage(pages, pageNumber);
+    current.flow.append(node);
+
+    if (current.page.scrollHeight > current.page.clientHeight + 2) {
+      current.page.classList.add("paper-page--overflow");
+    }
+  }
+
+  if (current.flow.children.length === 0) {
+    current.page.remove();
+  }
+}
+
+function collectPaperNodes(root) {
+  const flow = root.querySelector(":scope > .paper-flow");
+  if (flow) {
+    return Array.from(flow.children);
+  }
+
+  const pageNodes = root.querySelectorAll(":scope .paper-page .paper-flow > *");
+  if (pageNodes.length > 0) {
+    return Array.from(pageNodes);
+  }
+
+  const initialFlow = document.createElement("div");
+  initialFlow.className = "paper-flow";
+  initialFlow.append(...Array.from(root.children));
+  root.replaceChildren(initialFlow);
+  return Array.from(initialFlow.children);
+}
+
+function createPaperPage(container, pageNumber) {
+  const page = document.createElement("section");
+  page.className = "paper-page";
+  page.setAttribute("aria-label", `Page ${pageNumber}`);
+
+  const flow = document.createElement("div");
+  flow.className = "paper-flow";
+  page.append(flow);
+
+  const number = document.createElement("span");
+  number.className = "paper-page-number";
+  number.textContent = String(pageNumber);
+  page.append(number);
+
+  container.append(page);
+  return { page, flow };
+}
+
+function nextFrame() {
+  return new Promise((resolve) => requestAnimationFrame(resolve));
 }
 
 main();
