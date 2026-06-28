@@ -25,21 +25,23 @@
   </head>
   <body>
     <header class="site-header" aria-label="Site header">
-      <a class="wordmark" href="/" aria-label="Migaki home">
-        <span>Migaki</span>
-      </a>
+      <div class="site-header-inner">
+        <a class="wordmark" href="/" aria-label="Migaki home">
+          <span>Migaki</span>
+        </a>
 
-      <nav class="site-nav" aria-label="Primary navigation">
-        <a href="#map">Map</a>
-        <a href="#whitepaper">Whitepaper</a>
-        <a href="#author">Author</a>
-        <a href="https://github.com/migaki-dev/migaki">GitHub</a>
-      </nav>
+        <nav class="site-nav" aria-label="Primary navigation">
+          <a href="#map">Map</a>
+          <a href="#whitepaper">Whitepaper</a>
+          <a href="#author">Author</a>
+          <a href="https://github.com/migaki-dev/migaki">GitHub</a>
+        </nav>
 
-      <div class="theme-switcher" role="group" aria-label="Theme">
-        <button type="button" data-theme-choice="system" aria-pressed="true">System</button>
-        <button type="button" data-theme-choice="light" aria-pressed="false">Light</button>
-        <button type="button" data-theme-choice="dark" aria-pressed="false">Dark</button>
+        <div class="theme-switcher" role="group" aria-label="Theme">
+          <button type="button" data-theme-choice="system" aria-pressed="true">Sys</button>
+          <button type="button" data-theme-choice="light" aria-pressed="false">Light</button>
+          <button type="button" data-theme-choice="dark" aria-pressed="false">Dark</button>
+        </div>
       </div>
     </header>
 
@@ -56,19 +58,19 @@
           </p>
           <div class="actions" aria-label="Primary links">
             <a class="button primary" href="https://github.com/migaki-dev/migaki">Repository</a>
-            <a class="button" href="https://github.com/migaki-dev/migaki-whitepaper">Whitepaper</a>
+            <a class="button" href="#whitepaper">Whitepaper</a>
           </div>
         </div>
 
         <figure class="trace-figure" aria-label="Plan trace diagram">
           <div class="trace-grid" aria-hidden="true">
-            <span class="trace-node source">Plan</span>
+            <span class="trace-node source" data-step="01">Plan</span>
             <span class="trace-line one"></span>
-            <span class="trace-node pass">Pass</span>
+            <span class="trace-node pass" data-step="02">Pass</span>
             <span class="trace-line two"></span>
-            <span class="trace-node lower">Lower</span>
+            <span class="trace-node lower" data-step="03">Lower</span>
             <span class="trace-line three"></span>
-            <span class="trace-node evidence">Evidence</span>
+            <span class="trace-node evidence" data-step="04">Evidence</span>
           </div>
           <figcaption>Portable execution graph to auditable evidence.</figcaption>
         </figure>
@@ -99,51 +101,51 @@
             <span>Implementation tasks, design follow-ups, defects, and milestone planning.</span>
           </a>
 
-          <a class="link-card" href="https://github.com/migaki-dev/migaki-whitepaper">
+          <a class="link-card" href="#whitepaper">
             <span class="card-kicker">Paper</span>
             <strong>Whitepaper</strong>
-            <span>The longer-form technical framing for Migaki's execution model.</span>
+            <span>Read the rendered paper, with a link back to the source repository.</span>
           </a>
         </div>
       </section>
 
       <section class="whitepaper-preview" id="whitepaper" aria-labelledby="whitepaper-title">
-        <div class="whitepaper-heading">
-          <p class="eyebrow">Whitepaper</p>
-          <h2 id="whitepaper-title">Rendered from the whitepaper source.</h2>
-          <p class="whitepaper-text">
-            This page loads the LaTeX source from the sibling
-            <code>migaki-dev/migaki-whitepaper</code> repository and renders the
-            paper in-browser with KaTeX.
-          </p>
-          <div class="actions" aria-label="Whitepaper links">
+        <div class="whitepaper-shell">
+          <div class="whitepaper-heading">
+            <div>
+              <p class="eyebrow">Whitepaper</p>
+              <h2 id="whitepaper-title">Rendered from the whitepaper source.</h2>
+              <p class="whitepaper-text">
+                This page loads the LaTeX source from the sibling
+                <code>migaki-dev/migaki-whitepaper</code> repository and renders
+                the paper in-browser with KaTeX.
+              </p>
+            </div>
             <a class="button primary" href="https://github.com/migaki-dev/migaki-whitepaper">Source</a>
-            <a class="button" href="https://github.com/migaki-dev/migaki-whitepaper/blob/main/dist/migaki-whitepaper.pdf">PDF</a>
           </div>
-        </div>
 
-        <article class="whitepaper-reader" aria-live="polite" aria-busy="true">
-          <div class="paper-meta">
-            <span>Source: migaki-dev/migaki-whitepaper</span>
-            <span>Renderer: KaTeX 0.16.22</span>
-          </div>
-          <p class="paper-status" id="whitepaper-status">Loading whitepaper source...</p>
-          <div class="paper-document" id="whitepaper-document"></div>
-        </article>
-      </section>
-
-      <section class="author" id="author" aria-labelledby="author-title">
-        <div>
-          <p class="eyebrow">Author</p>
-          <h2 id="author-title">Created by Sasha Lopashev.</h2>
+          <article class="whitepaper-reader" aria-live="polite" aria-busy="true">
+            <div class="paper-toolbar">
+              <span>migaki-dev/migaki-whitepaper</span>
+              <span>KaTeX 0.16.22</span>
+            </div>
+            <div class="paper-viewport">
+              <p class="paper-status" id="whitepaper-status">Loading whitepaper source...</p>
+              <div class="paper-document" id="whitepaper-document"></div>
+            </div>
+          </article>
         </div>
-        <a class="button" href="https://aleksandr.codes">aleksandr.codes</a>
       </section>
     </main>
 
-    <footer class="site-footer">
-      <span>Code: MIT. Content: CC BY 4.0.</span>
-      <span>The Migaki name, logo, and brand assets require explicit permission.</span>
+    <footer class="site-footer" id="author">
+      <div class="site-footer-inner">
+        <span>Created by Sasha Lopashev</span>
+        <a href="https://aleksandr.codes">aleksandr.codes</a>
+        <span>Code: MIT</span>
+        <span>Content: CC BY 4.0</span>
+        <span>Brand assets require permission</span>
+      </div>
     </footer>
 
     <script src="theme.js"></script>
