@@ -1,5 +1,5 @@
 <!doctype html>
-<html lang="en" data-theme="system">
+<html lang="en" data-theme="light">
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
@@ -20,28 +20,69 @@
       const savedTheme = localStorage.getItem("migaki-theme");
       if (savedTheme === "light" || savedTheme === "dark") {
         document.documentElement.dataset.theme = savedTheme;
+      } else {
+        const prefersDark = window.matchMedia("(prefers-color-scheme: dark)").matches;
+        document.documentElement.dataset.theme = prefersDark ? "dark" : "light";
       }
     </script>
   </head>
   <body>
     <header class="site-header" aria-label="Site header">
       <div class="site-header-inner">
-        <a class="wordmark" href="/" aria-label="Migaki home">
-          <span>Migaki</span>
-        </a>
-
         <nav class="site-nav" aria-label="Primary navigation">
-          <a href="#map">Map</a>
-          <a href="#whitepaper">Whitepaper</a>
-          <a href="#author">Author</a>
-          <a href="https://github.com/migaki-dev/migaki">GitHub</a>
+          <a class="nav-icon-link" href="#map" aria-label="Project map" data-tooltip="Map">
+            <svg viewBox="0 0 24 24" aria-hidden="true">
+              <path d="m3.75 6.25 5.5-2.5 5.5 2.5 5.5-2.5v14l-5.5 2.5-5.5-2.5-5.5 2.5z" />
+              <path d="M9.25 3.75v14" />
+              <path d="M14.75 6.25v14" />
+            </svg>
+          </a>
+          <a class="nav-icon-link" href="#whitepaper" aria-label="Whitepaper" data-tooltip="Whitepaper">
+            <svg viewBox="0 0 24 24" aria-hidden="true">
+              <path d="M7 3.75h7.25L18 7.5v12.75H7z" />
+              <path d="M14.25 3.75V7.5H18" />
+              <path d="M9.75 11.25h4.5" />
+              <path d="M9.75 14.5h4.5" />
+              <path d="M9.75 17.75h2.6" />
+            </svg>
+          </a>
+          <a class="nav-icon-link" href="https://github.com/migaki-dev/migaki" aria-label="GitHub repository" data-tooltip="GitHub">
+            <svg viewBox="0 0 24 24" aria-hidden="true">
+              <path d="M12 2.75a9.4 9.4 0 0 0-2.97 18.32c.47.09.64-.2.64-.45v-1.58c-2.6.57-3.15-1.25-3.15-1.25-.43-1.08-1.04-1.37-1.04-1.37-.85-.58.06-.57.06-.57.94.07 1.43.97 1.43.97.84 1.43 2.19 1.02 2.73.78.08-.6.33-1.02.6-1.25-2.08-.24-4.27-1.04-4.27-4.63 0-1.02.37-1.86.97-2.52-.1-.24-.42-1.2.09-2.48 0 0 .79-.25 2.58.96a8.9 8.9 0 0 1 4.7 0c1.79-1.21 2.58-.96 2.58-.96.51 1.28.19 2.24.09 2.48.61.66.97 1.5.97 2.52 0 3.6-2.19 4.39-4.28 4.62.34.29.64.86.64 1.74v2.58c0 .25.17.55.65.45A9.4 9.4 0 0 0 12 2.75z" />
+            </svg>
+          </a>
         </nav>
 
-        <div class="theme-switcher" role="group" aria-label="Theme">
-          <button type="button" data-theme-choice="system" aria-pressed="true">Sys</button>
-          <button type="button" data-theme-choice="light" aria-pressed="false">Light</button>
-          <button type="button" data-theme-choice="dark" aria-pressed="false">Dark</button>
-        </div>
+        <button class="theme-toggle" type="button" data-theme-toggle aria-label="Switch to dark theme" aria-pressed="false">
+          <svg class="theme-icon sun-icon" viewBox="0 0 24 24" aria-hidden="true">
+            <g class="sun-rays">
+              <path d="M12 1.9v2.4" />
+              <path d="M12 19.7v2.4" />
+              <path d="m4.86 4.86 1.7 1.7" />
+              <path d="m17.44 17.44 1.7 1.7" />
+              <path d="M1.9 12h2.4" />
+              <path d="M19.7 12h2.4" />
+              <path d="m4.86 19.14 1.7-1.7" />
+              <path d="m17.44 6.56 1.7-1.7" />
+            </g>
+            <circle cx="12" cy="12" r="3.8" />
+          </svg>
+          <span class="toggle-track" aria-hidden="true">
+            <span class="toggle-thumb"></span>
+          </span>
+          <svg class="theme-icon moon-icon" viewBox="0 0 24 24" aria-hidden="true">
+            <defs>
+              <clipPath id="moon-phase-clip">
+                <circle cx="12" cy="12" r="6.8" />
+              </clipPath>
+            </defs>
+            <g class="moon-phase">
+              <circle class="moon-disc" cx="12" cy="12" r="6.8" />
+              <circle class="moon-shadow" cx="12" cy="12" r="6.9" clip-path="url(#moon-phase-clip)" />
+              <circle class="moon-outline" cx="12" cy="12" r="6.8" />
+            </g>
+          </svg>
+        </button>
       </div>
     </header>
 
@@ -138,10 +179,8 @@
       </section>
     </main>
 
-    <footer class="site-footer" id="author">
+    <footer class="site-footer">
       <div class="site-footer-inner">
-        <span>Created by Sasha Lopashev</span>
-        <a href="https://aleksandr.codes">aleksandr.codes</a>
         <span>Code: MIT</span>
         <span>Content: CC BY 4.0</span>
         <span>Brand assets require permission</span>
