@@ -364,6 +364,65 @@ figcaption {
   color: var(--muted);
 }
 
+.whitepaper-preview {
+  display: grid;
+  grid-template-columns: minmax(0, 0.92fr) minmax(300px, 1.08fr);
+  gap: clamp(24px, 5vw, 64px);
+  align-items: center;
+  padding: 60px 0 68px;
+  border-top: 1px solid var(--border);
+}
+
+.whitepaper-text {
+  max-width: 620px;
+  color: var(--muted);
+  font-size: clamp(1rem, 1.6vw, 1.16rem);
+}
+
+.formula-panel {
+  display: flex;
+  min-height: 212px;
+  flex-direction: column;
+  gap: 16px;
+  justify-content: space-between;
+  padding: clamp(20px, 3vw, 28px);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  background:
+    linear-gradient(145deg, color-mix(in srgb, var(--surface), transparent 2%), color-mix(in srgb, var(--surface-strong), transparent 12%)),
+    var(--surface);
+  color: var(--ink);
+  text-decoration: none;
+  box-shadow: var(--shadow);
+  transition:
+    border-color 160ms ease,
+    transform 160ms ease;
+}
+
+.formula-panel:hover,
+.formula-panel:focus-visible {
+  border-color: color-mix(in srgb, var(--accent), var(--border) 45%);
+  transform: translateY(-1px);
+}
+
+#formula {
+  display: block;
+  overflow-x: auto;
+  padding: 10px 0;
+  color: var(--ink);
+  font-size: clamp(1.35rem, 3vw, 2.35rem);
+}
+
+.katex-display {
+  margin: 0;
+  overflow-x: auto;
+  overflow-y: hidden;
+}
+
+.formula-link {
+  color: var(--muted);
+}
+
 .author {
   display: flex;
   gap: 24px;
@@ -414,6 +473,10 @@ figcaption {
 
   .link-grid {
     grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .whitepaper-preview {
+    grid-template-columns: 1fr;
   }
 }
 
@@ -482,6 +545,14 @@ figcaption {
 
   .link-card {
     min-height: 184px;
+  }
+
+  .whitepaper-preview {
+    padding: 34px 0 42px;
+  }
+
+  .formula-panel {
+    min-height: 178px;
   }
 
   .author {
