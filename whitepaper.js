@@ -72,7 +72,7 @@ async function main() {
     readerElement?.setAttribute("aria-busy", "false");
   } catch (error) {
     statusElement.textContent =
-      "Could not load the whitepaper source. The GitHub source and PDF links are still available above.";
+      "Could not load the whitepaper source. The GitHub source link is still available above.";
     readerElement?.setAttribute("aria-busy", "false");
     console.error(error);
   }
