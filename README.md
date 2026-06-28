@@ -4,6 +4,9 @@ This repository contains the static GitHub Pages site for Migaki.
 
 GitHub Pages can serve the site directly from the repository root. There is no
 build step; open `index.html` locally or publish the root of the default branch.
+The whitepaper reader fetches the LaTeX source from
+`migaki-dev/migaki-whitepaper` and renders math with KaTeX 0.16.22 from
+jsDelivr.
 
 ## Project links
 
