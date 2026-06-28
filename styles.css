@@ -411,123 +411,529 @@ h2 {
   box-shadow: var(--shadow);
 }
 
-.trace-grid {
-  position: relative;
-  display: grid;
-  grid-template-columns: 1fr;
-  gap: 14px;
-  min-height: 326px;
-  padding: 16px;
-  overflow: hidden;
-}
-
-.trace-grid::before {
-  position: absolute;
-  inset: 0;
-  border-radius: calc(var(--radius) - 2px);
-  background-image:
-    linear-gradient(color-mix(in srgb, var(--border), transparent 58%) 1px, transparent 1px),
-    linear-gradient(90deg, color-mix(in srgb, var(--border), transparent 58%) 1px, transparent 1px);
-  background-size: 34px 34px;
-  content: "";
-  mask-image: linear-gradient(to bottom, black, transparent 88%);
-}
-
-.trace-grid::after {
-  position: absolute;
-  inset: 16px 18%;
-  border-radius: 999px;
-  background: linear-gradient(180deg, color-mix(in srgb, var(--accent), transparent 80%), color-mix(in srgb, var(--warm), transparent 82%));
-  content: "";
-  filter: blur(28px);
-  opacity: 0.42;
-}
-
-.trace-node,
-.trace-line {
-  position: relative;
-  z-index: 1;
-}
-
-.trace-node {
-  display: inline-flex;
-  align-items: center;
-  justify-content: space-between;
-  width: min(64%, 292px);
-  min-height: 60px;
-  padding: 0 18px;
-  border: 1px solid var(--border);
-  border-radius: var(--radius);
-  background: color-mix(in srgb, var(--surface), var(--bg) 8%);
-  box-shadow:
-    0 16px 38px rgb(0 0 0 / 14%),
-    inset 0 1px 0 rgb(255 255 255 / 12%);
+.trace-diagram {
+  display: block;
+  width: 100%;
+  height: auto;
   color: var(--ink);
-  font-weight: 760;
 }
 
-.trace-node::before {
-  color: var(--muted);
-  content: attr(data-step);
-  font-size: 0.72rem;
+.trace-svg-surface {
+  fill: color-mix(in srgb, var(--surface), var(--bg) 8%);
 }
 
-.trace-node::after {
-  width: 10px;
-  height: 10px;
-  border-radius: 999px;
-  background: var(--accent);
-  content: "";
-  box-shadow: 0 0 0 5px color-mix(in srgb, var(--accent), transparent 82%);
+.trace-svg-grid {
+  fill: url(#trace-grid-pattern);
 }
 
-.trace-node.source,
-.trace-node.evidence {
-  justify-self: start;
+.trace-grid-line {
+  fill: none;
+  stroke: color-mix(in srgb, var(--border), transparent 56%);
+  stroke-width: 1;
+  vector-effect: non-scaling-stroke;
 }
 
-.trace-node.pass {
-  justify-self: center;
-  color: var(--cool);
+.trace-flow-stop-cool {
+  stop-color: var(--accent);
 }
 
-.trace-node.pass::after {
-  background: var(--cool);
-  box-shadow: 0 0 0 5px color-mix(in srgb, var(--cool), transparent 82%);
+.trace-flow-stop-mid {
+  stop-color: color-mix(in srgb, var(--accent), var(--warm) 35%);
 }
 
-.trace-node.lower {
-  justify-self: end;
+.trace-flow-stop-warm {
+  stop-color: var(--warm);
+}
+
+.trace-endpoint-glow {
+  fill: none;
+  filter: url(#trace-soft-glow);
+  stroke-width: 1.8;
+  transform-box: fill-box;
+  transform-origin: center;
+  vector-effect: non-scaling-stroke;
+}
+
+.trace-source-glow {
+  animation: trace-source-emit 5.2s ease-in-out infinite;
+  stroke: var(--accent);
+}
+
+.trace-provider-glow {
+  animation: trace-provider-receive 5.2s ease-in-out infinite;
+  stroke: var(--warm);
+}
+
+.trace-flow-base,
+.trace-flow-pulse {
+  fill: none;
+  stroke: url(#trace-flow-gradient);
+  stroke-linecap: round;
+  stroke-width: 4;
+  vector-effect: non-scaling-stroke;
+}
+
+.trace-flow-base {
+  opacity: 0.4;
+}
+
+.trace-flow-pulse {
+  animation: trace-flow 5.2s linear infinite;
+  filter: url(#trace-soft-glow);
+  opacity: 0;
+  stroke-dasharray: 0.085 1.22;
+  stroke-dashoffset: 0.085;
+  stroke-width: 4.6;
+}
+
+.trace-card {
+  color: var(--ink);
+  --active-fill: color-mix(in srgb, var(--surface), var(--accent) 10%);
+  --idle-fill: color-mix(in srgb, var(--surface), var(--bg) 18%);
+}
+
+.trace-card rect {
+  animation: trace-card-idle 5.2s linear infinite;
+  fill: var(--idle-fill);
+  stroke: color-mix(in srgb, var(--border), transparent 8%);
+  stroke-opacity: 0.68;
+  stroke-width: 1.2;
+  vector-effect: non-scaling-stroke;
+}
+
+.trace-card .trace-charge-fill {
+  animation-delay: 0s;
+  animation-duration: 5.2s;
+  animation-iteration-count: infinite;
+  animation-timing-function: linear;
+  fill: currentColor;
+  opacity: 0;
+  pointer-events: none;
+  stroke: none;
+  stroke-opacity: 0;
+  stroke-width: 0;
+  transform: scaleX(0);
+  transform-box: fill-box;
+  transform-origin: left center;
+}
+
+.trace-card .trace-source-charge {
+  animation-name: trace-source-charge;
+  color: var(--accent);
+}
+
+.trace-card .trace-backend-charge {
+  animation-name: trace-backend-charge;
   color: var(--warm);
 }
 
-.trace-node.lower::after {
-  background: var(--warm);
-  box-shadow: 0 0 0 5px color-mix(in srgb, var(--warm), transparent 82%);
+.trace-card-label {
+  dominant-baseline: middle;
+  fill: currentColor;
+  font-size: 24px;
+  font-weight: 760;
+  letter-spacing: 0;
+  text-anchor: middle;
 }
 
-.trace-line {
-  display: block;
-  width: 38%;
-  height: 4px;
-  border-radius: 999px;
-  background: linear-gradient(90deg, var(--accent), var(--cool), var(--warm));
-  box-shadow: 0 0 18px color-mix(in srgb, var(--accent), transparent 62%);
+.trace-card-pass {
+  color: var(--cool);
 }
 
-.trace-line.one {
-  justify-self: center;
-  rotate: 10deg;
+.trace-card-evidence {
+  color: var(--cool);
+  --active-fill: color-mix(in srgb, var(--surface), var(--cool) 13%);
 }
 
-.trace-line.two {
-  justify-self: end;
-  rotate: -12deg;
+.trace-card-provider {
+  color: var(--warm);
+  --active-fill: color-mix(in srgb, var(--surface), var(--warm) 13%);
 }
 
-.trace-line.three {
-  justify-self: center;
-  rotate: 11deg;
+.trace-pass-label,
+.trace-micro-label {
+  dominant-baseline: middle;
+  fill: currentColor;
+  font-weight: 760;
+  letter-spacing: 0;
+  text-anchor: middle;
+}
+
+.trace-pass-label {
+  font-size: 17px;
+}
+
+.trace-card-label-compact {
+  font-size: 21px;
+}
+
+.trace-endpoint-label {
+  font-size: 14px;
+}
+
+.trace-backend-label {
+  font-size: 16px;
+}
+
+.trace-micro-label {
+  fill: var(--muted);
+  font-size: 12px;
+  font-weight: 680;
+}
+
+.trace-card-evidence .trace-card-label-compact,
+.trace-card-provider .trace-card-label-compact {
+  font-size: 18px;
+}
+
+.trace-card-source rect {
+  stroke: color-mix(in srgb, var(--accent), var(--border) 40%);
+}
+
+.trace-card-source > rect:first-of-type {
+  animation-name: trace-source-card-activate;
+}
+
+.trace-card-plan > rect:first-of-type {
+  animation-name: trace-card-plan-activate;
+}
+
+.trace-card-context > rect:first-of-type {
+  animation-name: trace-card-context-activate;
+}
+
+.trace-card-cache > rect:first-of-type {
+  animation-name: trace-card-cache-activate;
+}
+
+.trace-card-routing > rect:first-of-type {
+  animation-name: trace-card-routing-activate;
+}
+
+.trace-card-verification > rect:first-of-type {
+  animation-name: trace-card-verification-activate;
+}
+
+.trace-card-evidence > rect:first-of-type {
+  animation-name: trace-card-evidence-activate;
+}
+
+.trace-card-provider > rect:first-of-type {
+  animation-name: trace-card-provider-activate;
+}
+
+.trace-card-evidence rect {
+  stroke: color-mix(in srgb, var(--cool), var(--border) 40%);
+}
+
+.trace-card-provider rect {
+  stroke: color-mix(in srgb, var(--warm), var(--border) 40%);
+}
+
+.trace-migaki-shell {
+  fill: color-mix(in srgb, var(--surface), transparent 76%);
+  stroke: color-mix(in srgb, var(--accent), var(--border) 54%);
+  stroke-width: 1.2;
+  vector-effect: non-scaling-stroke;
+}
+
+.trace-shell-label {
+  dominant-baseline: middle;
+  fill: var(--accent);
+  font-size: 16px;
+  font-weight: 760;
+  letter-spacing: 0;
+  text-anchor: start;
+}
+
+.trace-shell-subtitle {
+  dominant-baseline: middle;
+  fill: var(--muted);
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0;
+  text-anchor: start;
+  text-transform: uppercase;
+}
+
+.trace-card-source {
+  color: var(--ink);
+}
+
+@keyframes trace-source-emit {
+  0%,
+  100% {
+    opacity: 0.22;
+    transform: scale(1);
+  }
+
+  9% {
+    opacity: 0.92;
+    transform: scale(1.035);
+  }
+
+  18% {
+    opacity: 0.84;
+    transform: scale(1.055);
+  }
+
+  27% {
+    opacity: 0.24;
+    transform: scale(1.08);
+  }
+}
+
+@keyframes trace-source-charge {
+  0% {
+    opacity: 0.08;
+    transform: scaleX(0);
+  }
+
+  16% {
+    opacity: 0.34;
+    transform: scaleX(1);
+  }
+
+  24% {
+    opacity: 0.14;
+    transform: scaleX(1);
+  }
+
+  32%,
+  100% {
+    opacity: 0;
+    transform: scaleX(1);
+  }
+}
+
+@keyframes trace-backend-charge {
+  0%,
+  84.2% {
+    opacity: 0;
+    transform: scaleX(0);
+  }
+
+  86.2% {
+    opacity: 0.34;
+    transform: scaleX(1);
+  }
+
+  94% {
+    opacity: 0.3;
+    transform: scaleX(1);
+  }
+
+  100% {
+    opacity: 0;
+    transform: scaleX(1);
+  }
+}
+
+@keyframes trace-provider-receive {
+  0%,
+  84.2%,
+  100% {
+    opacity: 0.2;
+    transform: scale(1);
+  }
+
+  86.2% {
+    opacity: 0.96;
+    transform: scale(1.035);
+  }
+
+  94% {
+    opacity: 0.42;
+    transform: scale(1.08);
+  }
+}
+
+@keyframes trace-flow {
+  0%,
+  16% {
+    opacity: 0;
+    stroke-dashoffset: 0.085;
+  }
+
+  18% {
+    opacity: 0.98;
+    stroke-dashoffset: 0;
+  }
+
+  90% {
+    opacity: 0.98;
+    stroke-dashoffset: -0.985;
+  }
+
+  96% {
+    opacity: 0.82;
+    stroke-dashoffset: -0.985;
+  }
+
+  100% {
+    opacity: 0;
+    stroke-dashoffset: -1.07;
+  }
+}
+
+@keyframes trace-card-idle {
+  0%,
+  100% {
+    fill: var(--idle-fill);
+    stroke-opacity: 0.68;
+    stroke-width: 1.2;
+  }
+}
+
+@keyframes trace-card-plan-activate {
+  0%,
+  17.5%,
+  25.4%,
+  100% {
+    fill: var(--idle-fill);
+    stroke-opacity: 0.68;
+    stroke-width: 1.2;
+  }
+
+  18%,
+  24.4% {
+    fill: var(--active-fill);
+    stroke-opacity: 1;
+    stroke-width: 2;
+  }
+}
+
+@keyframes trace-card-context-activate {
+  0%,
+  27.5%,
+  41%,
+  100% {
+    fill: var(--idle-fill);
+    stroke-opacity: 0.68;
+    stroke-width: 1.2;
+  }
+
+  28.1%,
+  40% {
+    fill: var(--active-fill);
+    stroke-opacity: 1;
+    stroke-width: 2;
+  }
+}
+
+@keyframes trace-card-cache-activate {
+  0%,
+  38.8%,
+  52.2%,
+  100% {
+    fill: var(--idle-fill);
+    stroke-opacity: 0.68;
+    stroke-width: 1.2;
+  }
+
+  39.4%,
+  51.2% {
+    fill: var(--active-fill);
+    stroke-opacity: 1;
+    stroke-width: 2;
+  }
+}
+
+@keyframes trace-card-routing-activate {
+  0%,
+  50%,
+  63.4%,
+  100% {
+    fill: var(--idle-fill);
+    stroke-opacity: 0.68;
+    stroke-width: 1.2;
+  }
+
+  50.6%,
+  62.4% {
+    fill: var(--active-fill);
+    stroke-opacity: 1;
+    stroke-width: 2;
+  }
+}
+
+@keyframes trace-card-verification-activate {
+  0%,
+  61.2%,
+  74.7%,
+  100% {
+    fill: var(--idle-fill);
+    stroke-opacity: 0.68;
+    stroke-width: 1.2;
+  }
+
+  61.8%,
+  73.7% {
+    fill: var(--active-fill);
+    stroke-opacity: 1;
+    stroke-width: 2;
+  }
+}
+
+@keyframes trace-card-evidence-activate {
+  0%,
+  72.7%,
+  86.1%,
+  100% {
+    fill: var(--idle-fill);
+    stroke-opacity: 0.68;
+    stroke-width: 1.2;
+  }
+
+  73.3%,
+  85.1% {
+    fill: var(--active-fill);
+    stroke-opacity: 1;
+    stroke-width: 2;
+  }
+}
+
+@keyframes trace-card-provider-activate {
+  0%,
+  84.3%,
+  96%,
+  100% {
+    fill: var(--idle-fill);
+    stroke-opacity: 0.68;
+    stroke-width: 1.2;
+  }
+
+  84.9%,
+  95% {
+    fill: var(--active-fill);
+    stroke-opacity: 1;
+    stroke-width: 2;
+  }
+}
+
+@keyframes trace-source-card-activate {
+  0%,
+  18% {
+    fill: var(--active-fill);
+    stroke-opacity: 1;
+    stroke-width: 2;
+  }
+
+  28%,
+  100% {
+    fill: var(--idle-fill);
+    stroke-opacity: 0.68;
+    stroke-width: 1.2;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .trace-endpoint-glow,
+  .trace-charge-fill,
+  .trace-flow-pulse,
+  .trace-card rect {
+    animation: none;
+  }
 }
 
 figcaption {
@@ -1001,22 +1407,6 @@ figcaption {
 
   .trace-figure {
     padding: 12px;
-  }
-
-  .trace-grid {
-    min-height: 168px;
-    gap: 8px;
-    padding: 8px;
-  }
-
-  .trace-node {
-    width: min(70%, 240px);
-    min-height: 36px;
-    font-size: 0.9rem;
-  }
-
-  .trace-line {
-    width: 34%;
   }
 
   figcaption {
