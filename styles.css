@@ -14,6 +14,8 @@
   --cool: #7059b7;
   --sun: #d88a21;
   --moon: #5967cc;
+  --moon-fill: #777fd6;
+  --moon-crater: #4f59bb;
   --header-bg: rgb(246 247 251 / 88%);
   --shadow: 0 24px 80px rgb(31 38 58 / 12%);
   --radius: 8px;
@@ -37,6 +39,8 @@
   --cool: #b6a8ff;
   --sun: #f5b24e;
   --moon: #c5ceff;
+  --moon-fill: #d8dcef;
+  --moon-crater: #96a1cf;
   --header-bg: rgb(17 19 24 / 88%);
   --shadow: 0 24px 80px rgb(0 0 0 / 34%);
 }
@@ -218,14 +222,30 @@ main {
 }
 
 .moon-disc {
-  fill: color-mix(in srgb, var(--moon), transparent 18%);
+  fill: var(--moon-fill);
   stroke: none;
 }
 
 .moon-shadow {
-  fill: color-mix(in srgb, var(--surface), var(--bg) 24%);
+  fill: color-mix(in srgb, var(--surface), var(--bg) 28%);
   stroke: none;
-  transform: translateX(-4.4px);
+  opacity: 0;
+  transform-box: fill-box;
+  transform-origin: center;
+}
+
+.moon-shadow-left {
+  transform: translateX(-14.2px);
+}
+
+.moon-shadow-right {
+  transform: translateX(14.2px);
+}
+
+.moon-crater {
+  fill: color-mix(in srgb, var(--moon-crater), transparent 4%);
+  stroke: color-mix(in srgb, var(--moon-fill), white 28%);
+  stroke-width: 0.42;
 }
 
 .moon-outline {
@@ -279,10 +299,12 @@ main {
   transform-origin: center;
 }
 
-:root[data-theme="dark"] .moon-shadow {
-  animation: moon-phase 3.8s ease-in-out infinite;
-  transform-box: fill-box;
-  transform-origin: center;
+:root[data-theme="dark"] .moon-shadow-left {
+  animation: moon-phase-left 7.2s ease-in-out infinite;
+}
+
+:root[data-theme="dark"] .moon-shadow-right {
+  animation: moon-phase-right 7.2s ease-in-out infinite;
 }
 
 @keyframes sun-rays {
@@ -298,14 +320,52 @@ main {
   }
 }
 
-@keyframes moon-phase {
+@keyframes moon-phase-left {
   0%,
+  8%,
+  46%,
   100% {
-    transform: translateX(-4.4px);
+    opacity: 0;
+    transform: translateX(-14.2px);
   }
 
-  50% {
-    transform: translateX(-13.2px);
+  14%,
+  34% {
+    opacity: 1;
+  }
+
+  24% {
+    opacity: 1;
+    transform: translateX(-4.8px);
+  }
+
+  40% {
+    opacity: 0;
+    transform: translateX(-14.2px);
+  }
+}
+
+@keyframes moon-phase-right {
+  0%,
+  50%,
+  100% {
+    opacity: 0;
+    transform: translateX(14.2px);
+  }
+
+  56%,
+  78% {
+    opacity: 1;
+  }
+
+  66% {
+    opacity: 1;
+    transform: translateX(4.8px);
+  }
+
+  90% {
+    opacity: 0;
+    transform: translateX(14.2px);
   }
 }
 

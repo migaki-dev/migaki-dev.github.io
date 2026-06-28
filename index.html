@@ -78,7 +78,12 @@
             </defs>
             <g class="moon-phase">
               <circle class="moon-disc" cx="12" cy="12" r="6.8" />
-              <circle class="moon-shadow" cx="12" cy="12" r="6.9" clip-path="url(#moon-phase-clip)" />
+              <g class="moon-craters" clip-path="url(#moon-phase-clip)">
+                <circle class="moon-crater moon-crater-large" cx="9.4" cy="9.3" r="1.35" />
+                <circle class="moon-crater moon-crater-small" cx="14.5" cy="13.8" r="0.92" />
+              </g>
+              <circle class="moon-shadow moon-shadow-left" cx="12" cy="12" r="7" clip-path="url(#moon-phase-clip)" />
+              <circle class="moon-shadow moon-shadow-right" cx="12" cy="12" r="7" clip-path="url(#moon-phase-clip)" />
               <circle class="moon-outline" cx="12" cy="12" r="6.8" />
             </g>
           </svg>
