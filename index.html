@@ -104,16 +104,126 @@
         </div>
 
         <figure class="trace-figure" aria-label="Plan trace diagram">
-          <div class="trace-grid" aria-hidden="true">
-            <span class="trace-node source" data-step="01">Plan</span>
-            <span class="trace-line one"></span>
-            <span class="trace-node pass" data-step="02">Pass</span>
-            <span class="trace-line two"></span>
-            <span class="trace-node lower" data-step="03">Lower</span>
-            <span class="trace-line three"></span>
-            <span class="trace-node evidence" data-step="04">Evidence</span>
-          </div>
-          <figcaption>Portable execution graph to auditable evidence.</figcaption>
+          <svg
+            class="trace-diagram"
+            viewBox="0 0 720 440"
+            role="img"
+            aria-labelledby="trace-title trace-desc"
+            xmlns="http://www.w3.org/2000/svg"
+          >
+            <title id="trace-title">Migaki execution trace</title>
+            <desc id="trace-desc">
+              AI-native code enters Migaki as mIR, flows through context, cache, routing, verification, and evidence, then reaches an AI backend.
+            </desc>
+
+            <defs>
+              <linearGradient id="trace-flow-gradient" x1="24" y1="220" x2="696" y2="220" gradientUnits="userSpaceOnUse">
+                <stop class="trace-flow-stop-cool" offset="0%" />
+                <stop class="trace-flow-stop-mid" offset="48%" />
+                <stop class="trace-flow-stop-warm" offset="100%" />
+              </linearGradient>
+
+              <pattern id="trace-grid-pattern" width="36" height="36" patternUnits="userSpaceOnUse">
+                <path class="trace-grid-line" d="M 36 0 H 0 V 36" />
+              </pattern>
+
+              <linearGradient id="trace-grid-fade" x1="0" y1="0" x2="0" y2="1">
+                <stop offset="0%" stop-color="white" />
+                <stop offset="74%" stop-color="white" />
+                <stop offset="100%" stop-color="black" />
+              </linearGradient>
+
+              <mask id="trace-grid-mask">
+                <rect width="720" height="440" fill="url(#trace-grid-fade)" />
+              </mask>
+
+              <filter id="trace-soft-glow" x="-60%" y="-60%" width="220%" height="220%">
+                <feGaussianBlur stdDeviation="5" result="blur" />
+                <feMerge>
+                  <feMergeNode in="blur" />
+                  <feMergeNode in="SourceGraphic" />
+                </feMerge>
+              </filter>
+            </defs>
+
+            <rect class="trace-svg-surface" width="720" height="440" rx="8" />
+            <rect class="trace-svg-grid" x="10" y="0" width="700" height="350" mask="url(#trace-grid-mask)" />
+
+            <g class="trace-endpoint-glows">
+              <rect class="trace-endpoint-glow trace-source-glow" x="20" y="172" width="136" height="96" rx="10" />
+              <rect class="trace-endpoint-glow trace-provider-glow" x="586" y="302" width="128" height="84" rx="10" />
+            </g>
+
+            <g class="trace-migaki-block">
+              <rect class="trace-migaki-shell" x="170" y="48" width="392" height="344" rx="14" />
+              <text class="trace-shell-label" x="190" y="78">Migaki</text>
+              <text class="trace-shell-subtitle" x="190" y="102">passes over mIR</text>
+            </g>
+
+            <g class="trace-flows">
+              <path
+                class="trace-flow-base"
+                d="M 152 220 H 198 H 288 C 336 220 326 92 376 92 H 498 C 528 92 528 154 498 154 H 376 C 346 154 346 216 376 216 H 498 C 528 216 528 278 498 278 H 376 C 346 278 346 344 376 344 H 498 H 590"
+                pathLength="1"
+              />
+              <path
+                class="trace-flow-pulse"
+                d="M 152 220 H 198 H 288 C 336 220 326 92 376 92 H 498 C 528 92 528 154 498 154 H 376 C 346 154 346 216 376 216 H 498 C 528 216 528 278 498 278 H 376 C 346 278 346 344 376 344 H 498 H 590"
+                pathLength="1"
+              />
+            </g>
+
+            <g class="trace-cards">
+              <g class="trace-card trace-card-source" transform="translate(24 176)">
+                <rect width="128" height="88" rx="8" />
+                <rect class="trace-charge-fill trace-source-charge" x="4" y="4" width="120" height="80" rx="6" />
+                <text class="trace-card-label trace-endpoint-label" x="64" y="44">AI-Native Code</text>
+              </g>
+
+              <g class="trace-card trace-card-plan" transform="translate(198 188)">
+                <rect width="90" height="64" rx="8" />
+                <text class="trace-card-label trace-card-label-compact" x="45" y="28">mIR</text>
+                <text class="trace-micro-label" x="45" y="48">plan</text>
+              </g>
+
+              <g class="trace-card trace-card-pass trace-card-chip trace-card-context" transform="translate(376 70)">
+                <rect width="122" height="44" rx="8" />
+                <text class="trace-pass-label" x="61" y="18">Context</text>
+                <text class="trace-micro-label" x="61" y="33">dedup + trim</text>
+              </g>
+
+              <g class="trace-card trace-card-pass trace-card-chip trace-card-cache" transform="translate(376 132)">
+                <rect width="122" height="44" rx="8" />
+                <text class="trace-pass-label" x="61" y="18">Cache</text>
+                <text class="trace-micro-label" x="61" y="33">prefix layout</text>
+              </g>
+
+              <g class="trace-card trace-card-pass trace-card-chip trace-card-routing" transform="translate(376 194)">
+                <rect width="122" height="44" rx="8" />
+                <text class="trace-pass-label" x="61" y="18">Routing</text>
+                <text class="trace-micro-label" x="61" y="33">model + fallback</text>
+              </g>
+
+              <g class="trace-card trace-card-pass trace-card-chip trace-card-verification" transform="translate(376 256)">
+                <rect width="122" height="44" rx="8" />
+                <text class="trace-pass-label" x="61" y="18">Verification</text>
+                <text class="trace-micro-label" x="61" y="33">policy + validators</text>
+              </g>
+
+              <g class="trace-card trace-card-evidence" transform="translate(376 316)">
+                <rect width="122" height="56" rx="8" />
+                <text class="trace-card-label trace-card-label-compact" x="61" y="22">Evidence</text>
+                <text class="trace-micro-label" x="61" y="40">trace bundle</text>
+              </g>
+
+              <g class="trace-card trace-card-provider" transform="translate(590 306)">
+                <rect width="120" height="76" rx="8" />
+                <rect class="trace-charge-fill trace-backend-charge" x="4" y="4" width="112" height="68" rx="6" />
+                <text class="trace-card-label trace-endpoint-label trace-backend-label" x="60" y="38">AI Backend</text>
+              </g>
+            </g>
+          </svg>
+          <figcaption>AI-native code flows through Migaki into backend execution.</figcaption>
         </figure>
       </section>
 
