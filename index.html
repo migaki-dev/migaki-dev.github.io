@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <meta
       name="description"
-      content="Migaki is an execution optimizer for AI agent workflows: portable execution graphs, provider-aware lowering, and evidence traces."
+      content="Migaki is an execution optimizer for AI-native code: portable execution graphs, provider-aware lowering, and evidence traces."
     />
     <meta name="color-scheme" content="light dark" />
     <title>Migaki</title>
@@ -94,24 +94,23 @@
     <main>
       <section class="intro" aria-labelledby="intro-title">
         <div class="intro-copy">
-          <p class="eyebrow">Execution optimizer for AI agent workflows</p>
-          <h1 id="intro-title">Migaki</h1>
+          <p class="eyebrow">Execution optimizer for AI-native code</p>
+          <h1 id="intro-title" aria-label="Migaki">
+            <span class="migaki-title-word" aria-hidden="true">
+              <span class="migaki-title-syllable">Mi</span><span class="migaki-title-syllable">ga</span><span class="migaki-title-syllable">ki</span>
+            </span>
+          </h1>
           <p class="intro-text">
             Portable execution graphs, provider-aware lowering, and evidence
-            traces for AI agent workflows. Migaki represents agent work as
-            explicit plans, optimizes those plans, and records what changed and
-            why.
+            traces. Migaki turns AI-native code into explicit plans, optimizes
+            them for execution, and records what changed and why.
           </p>
-          <div class="actions" aria-label="Primary links">
-            <a class="button primary" href="https://github.com/migaki-dev/migaki">Repository</a>
-            <a class="button" href="#whitepaper">Whitepaper</a>
-          </div>
         </div>
 
         <figure class="trace-figure" aria-label="Plan trace diagram">
           <svg
             class="trace-diagram"
-            viewBox="0 0 720 440"
+            viewBox="7 0 720 440"
             role="img"
             aria-labelledby="trace-title trace-desc"
             xmlns="http://www.w3.org/2000/svg"
@@ -123,24 +122,33 @@
 
             <defs>
               <linearGradient id="trace-flow-gradient" x1="24" y1="220" x2="696" y2="220" gradientUnits="userSpaceOnUse">
-                <stop class="trace-flow-stop-cool" offset="0%" />
-                <stop class="trace-flow-stop-mid" offset="48%" />
-                <stop class="trace-flow-stop-warm" offset="100%" />
+                <stop class="trace-flow-stop" offset="0%" />
+                <stop class="trace-flow-stop" offset="48%" />
+                <stop class="trace-flow-stop" offset="100%" />
               </linearGradient>
 
-              <pattern id="trace-grid-pattern" width="36" height="36" patternUnits="userSpaceOnUse">
-                <path class="trace-grid-line" d="M 36 0 H 0 V 36" />
-              </pattern>
-
-              <linearGradient id="trace-grid-fade" x1="0" y1="0" x2="0" y2="1">
-                <stop offset="0%" stop-color="white" />
-                <stop offset="74%" stop-color="white" />
-                <stop offset="100%" stop-color="black" />
+              <linearGradient id="trace-tile-sweep-ltr" x1="0%" y1="0%" x2="100%" y2="0%">
+                <stop class="trace-sweep-stop-clear" offset="0%" />
+                <stop class="trace-sweep-stop-faint" offset="22%" />
+                <stop class="trace-sweep-stop-trail" offset="54%" />
+                <stop class="trace-sweep-stop-core" offset="78%" />
+                <stop class="trace-sweep-stop-front" offset="100%" />
               </linearGradient>
 
-              <mask id="trace-grid-mask">
-                <rect width="720" height="440" fill="url(#trace-grid-fade)" />
-              </mask>
+              <linearGradient id="trace-tile-sweep-rtl" x1="0%" y1="0%" x2="100%" y2="0%">
+                <stop class="trace-sweep-stop-front" offset="0%" />
+                <stop class="trace-sweep-stop-core" offset="22%" />
+                <stop class="trace-sweep-stop-trail" offset="46%" />
+                <stop class="trace-sweep-stop-faint" offset="78%" />
+                <stop class="trace-sweep-stop-clear" offset="100%" />
+              </linearGradient>
+
+              <linearGradient id="trace-connector-pulse-ltr" x1="0%" y1="0%" x2="100%" y2="0%">
+                <stop class="trace-connector-stop-clear" offset="0%" />
+                <stop class="trace-connector-stop-faint" offset="32%" />
+                <stop class="trace-connector-stop-core" offset="78%" />
+                <stop class="trace-connector-stop-front" offset="100%" />
+              </linearGradient>
 
               <filter id="trace-soft-glow" x="-60%" y="-60%" width="220%" height="220%">
                 <feGaussianBlur stdDeviation="5" result="blur" />
@@ -150,10 +158,6 @@
                 </feMerge>
               </filter>
             </defs>
-
-            <rect class="trace-svg-surface" width="720" height="440" rx="8" />
-            <rect class="trace-svg-grid" x="10" y="0" width="700" height="350" mask="url(#trace-grid-mask)" />
-
             <g class="trace-endpoint-glows">
               <rect class="trace-endpoint-glow trace-source-glow" x="20" y="172" width="136" height="96" rx="10" />
               <rect class="trace-endpoint-glow trace-provider-glow" x="586" y="302" width="128" height="84" rx="10" />
@@ -171,9 +175,55 @@
                 d="M 152 220 H 198 H 288 C 336 220 326 92 376 92 H 498 C 528 92 528 154 498 154 H 376 C 346 154 346 216 376 216 H 498 C 528 216 528 278 498 278 H 376 C 346 278 346 344 376 344 H 498 H 590"
                 pathLength="1"
               />
+              <rect
+                class="trace-flow-short-band trace-flow-short-band-source"
+                x="152"
+                y="217.5"
+                width="30"
+                height="5"
+                rx="2.5"
+              />
               <path
-                class="trace-flow-pulse"
-                d="M 152 220 H 198 H 288 C 336 220 326 92 376 92 H 498 C 528 92 528 154 498 154 H 376 C 346 154 346 216 376 216 H 498 C 528 216 528 278 498 278 H 376 C 346 278 346 344 376 344 H 498 H 590"
+                class="trace-flow-pulse trace-flow-hop-source-plan"
+                d="M 152 220 H 198"
+                pathLength="1"
+              />
+              <path
+                class="trace-flow-pulse trace-flow-hop-plan-context"
+                d="M 288 220 C 336 220 326 92 376 92"
+                pathLength="1"
+              />
+              <path
+                class="trace-flow-pulse trace-flow-hop-context-cache"
+                d="M 498 92 C 528 92 528 154 498 154"
+                pathLength="1"
+              />
+              <path
+                class="trace-flow-pulse trace-flow-hop-cache-routing"
+                d="M 376 154 C 346 154 346 216 376 216"
+                pathLength="1"
+              />
+              <path
+                class="trace-flow-pulse trace-flow-hop-routing-verification"
+                d="M 498 216 C 528 216 528 278 498 278"
+                pathLength="1"
+              />
+              <path
+                class="trace-flow-pulse trace-flow-hop-verification-evidence"
+                d="M 376 278 C 346 278 346 344 376 344"
+                pathLength="1"
+              />
+              <rect
+                class="trace-flow-short-band trace-flow-short-band-provider"
+                x="498"
+                y="341.5"
+                width="44"
+                height="5"
+                rx="2.5"
+              />
+              <path
+                class="trace-flow-pulse trace-flow-hop-evidence-provider"
+                d="M 498 344 H 590"
                 pathLength="1"
               />
             </g>
@@ -181,128 +231,128 @@
             <g class="trace-cards">
               <g class="trace-card trace-card-source" transform="translate(24 176)">
                 <rect width="128" height="88" rx="8" />
-                <rect class="trace-charge-fill trace-source-charge" x="4" y="4" width="120" height="80" rx="6" />
+                <rect class="trace-endpoint-charge trace-source-charge" x="4" y="4" width="120" height="80" rx="6" />
                 <text class="trace-card-label trace-endpoint-label" x="64" y="44">AI-Native Code</text>
               </g>
 
               <g class="trace-card trace-card-plan" transform="translate(198 188)">
                 <rect width="90" height="64" rx="8" />
+                <rect class="trace-card-sweep trace-card-sweep-ltr" x="4" y="4" width="58" height="56" rx="6" />
                 <text class="trace-card-label trace-card-label-compact" x="45" y="28">mIR</text>
                 <text class="trace-micro-label" x="45" y="48">plan</text>
               </g>
 
-              <g class="trace-card trace-card-pass trace-card-chip trace-card-context" transform="translate(376 70)">
-                <rect width="122" height="44" rx="8" />
-                <text class="trace-pass-label" x="61" y="18">Context</text>
-                <text class="trace-micro-label" x="61" y="33">dedup + trim</text>
+              <g class="trace-card trace-card-pass trace-card-chip trace-card-context" transform="translate(376 65)">
+                <rect width="122" height="54" rx="8" />
+                <rect class="trace-card-sweep trace-card-sweep-ltr" x="4" y="4" width="82" height="46" rx="6" />
+                <text class="trace-pass-label" x="61" y="21">Context</text>
+                <text class="trace-micro-label" x="61" y="38">dedup + trim</text>
               </g>
 
-              <g class="trace-card trace-card-pass trace-card-chip trace-card-cache" transform="translate(376 132)">
-                <rect width="122" height="44" rx="8" />
-                <text class="trace-pass-label" x="61" y="18">Cache</text>
-                <text class="trace-micro-label" x="61" y="33">prefix layout</text>
+              <g class="trace-card trace-card-pass trace-card-chip trace-card-cache" transform="translate(376 127)">
+                <rect width="122" height="54" rx="8" />
+                <rect class="trace-card-sweep trace-card-sweep-rtl" x="4" y="4" width="82" height="46" rx="6" />
+                <text class="trace-pass-label" x="61" y="21">Cache</text>
+                <text class="trace-micro-label" x="61" y="38">prefix layout</text>
               </g>
 
-              <g class="trace-card trace-card-pass trace-card-chip trace-card-routing" transform="translate(376 194)">
-                <rect width="122" height="44" rx="8" />
-                <text class="trace-pass-label" x="61" y="18">Routing</text>
-                <text class="trace-micro-label" x="61" y="33">model + fallback</text>
+              <g class="trace-card trace-card-pass trace-card-chip trace-card-routing" transform="translate(376 189)">
+                <rect width="122" height="54" rx="8" />
+                <rect class="trace-card-sweep trace-card-sweep-ltr" x="4" y="4" width="82" height="46" rx="6" />
+                <text class="trace-pass-label" x="61" y="21">Routing</text>
+                <text class="trace-micro-label" x="61" y="38">model + fallback</text>
               </g>
 
-              <g class="trace-card trace-card-pass trace-card-chip trace-card-verification" transform="translate(376 256)">
-                <rect width="122" height="44" rx="8" />
-                <text class="trace-pass-label" x="61" y="18">Verification</text>
-                <text class="trace-micro-label" x="61" y="33">policy + validators</text>
+              <g class="trace-card trace-card-pass trace-card-chip trace-card-verification" transform="translate(376 251)">
+                <rect width="122" height="54" rx="8" />
+                <rect class="trace-card-sweep trace-card-sweep-rtl" x="4" y="4" width="82" height="46" rx="6" />
+                <text class="trace-pass-label" x="61" y="21">Verification</text>
+                <text class="trace-micro-label" x="61" y="38">policy + validators</text>
               </g>
 
-              <g class="trace-card trace-card-evidence" transform="translate(376 316)">
-                <rect width="122" height="56" rx="8" />
-                <text class="trace-card-label trace-card-label-compact" x="61" y="22">Evidence</text>
-                <text class="trace-micro-label" x="61" y="40">trace bundle</text>
+              <g class="trace-card trace-card-pass trace-card-chip trace-card-evidence" transform="translate(376 317)">
+                <rect width="122" height="54" rx="8" />
+                <rect class="trace-card-sweep trace-card-sweep-ltr" x="4" y="4" width="82" height="46" rx="6" />
+                <text class="trace-pass-label" x="61" y="21">Evidence</text>
+                <text class="trace-micro-label" x="61" y="38">trace bundle</text>
               </g>
 
               <g class="trace-card trace-card-provider" transform="translate(590 306)">
                 <rect width="120" height="76" rx="8" />
-                <rect class="trace-charge-fill trace-backend-charge" x="4" y="4" width="112" height="68" rx="6" />
+                <rect class="trace-endpoint-charge trace-backend-charge" x="4" y="4" width="112" height="68" rx="6" />
                 <text class="trace-card-label trace-endpoint-label trace-backend-label" x="60" y="38">AI Backend</text>
               </g>
             </g>
           </svg>
-          <figcaption>AI-native code flows through Migaki into backend execution.</figcaption>
+          <figcaption>A portable plan becomes an optimized, evidence-backed run.</figcaption>
         </figure>
       </section>
 
       <section class="section" id="map" aria-labelledby="map-title">
         <div class="section-heading">
           <p class="eyebrow">Project map</p>
-          <h2 id="map-title">One place for the work in progress.</h2>
+          <h2 id="map-title">Work in progress, in one place.</h2>
         </div>
 
         <div class="link-grid">
           <a class="link-card" href="https://github.com/migaki-dev/migaki">
             <span class="card-kicker">Code</span>
-            <strong>Main repository</strong>
             <span>TypeScript workspace, source, bootstrap, quality gate, and project direction.</span>
           </a>
 
           <a class="link-card" href="https://github.com/migaki-dev/migaki/wiki">
-            <span class="card-kicker">Notes</span>
-            <strong>Wiki</strong>
+            <span class="card-kicker">Wiki</span>
             <span>Architecture notes, decisions, and living documentation as the design sharpens.</span>
           </a>
 
           <a class="link-card" href="https://github.com/migaki-dev/migaki/issues">
-            <span class="card-kicker">Queue</span>
-            <strong>Issues</strong>
+            <span class="card-kicker">Backlog</span>
             <span>Implementation tasks, design follow-ups, defects, and milestone planning.</span>
           </a>
 
           <a class="link-card" href="#whitepaper">
-            <span class="card-kicker">Paper</span>
-            <strong>Whitepaper</strong>
+            <span class="card-kicker">Whitepaper</span>
             <span>Read the rendered paper, with a link back to the source repository.</span>
           </a>
         </div>
       </section>
 
       <section class="whitepaper-preview" id="whitepaper" aria-labelledby="whitepaper-title">
-        <div class="whitepaper-shell">
-          <div class="whitepaper-heading">
-            <div>
-              <p class="eyebrow">Whitepaper</p>
-              <h2 id="whitepaper-title">Rendered from the whitepaper source.</h2>
-              <p class="whitepaper-text">
-                This page loads the LaTeX source from the sibling
-                <code>migaki-dev/migaki-whitepaper</code> repository and renders
-                the paper in-browser with KaTeX.
-              </p>
-            </div>
-            <a class="button primary" href="https://github.com/migaki-dev/migaki-whitepaper">Source</a>
-          </div>
-
-          <article class="whitepaper-reader" aria-live="polite" aria-busy="true">
-            <div class="paper-toolbar">
+        <article class="whitepaper-reader" aria-live="polite" aria-busy="true">
+          <div class="paper-toolbar">
+            <a
+              class="paper-source-link"
+              id="whitepaper-title"
+              href="https://github.com/migaki-dev/migaki-whitepaper"
+            >
+              <svg viewBox="0 0 24 24" aria-hidden="true">
+                <path d="M12 2.75a9.4 9.4 0 0 0-2.97 18.32c.47.09.64-.2.64-.45v-1.58c-2.6.57-3.15-1.25-3.15-1.25-.43-1.08-1.04-1.37-1.04-1.37-.85-.58.06-.57.06-.57.94.07 1.43.97 1.43.97.84 1.43 2.19 1.02 2.73.78.08-.6.33-1.02.6-1.25-2.08-.24-4.27-1.04-4.27-4.63 0-1.02.37-1.86.97-2.52-.1-.24-.42-1.2.09-2.48 0 0 .79-.25 2.58.96a8.9 8.9 0 0 1 4.7 0c1.79-1.21 2.58-.96 2.58-.96.51 1.28.19 2.24.09 2.48.61.66.97 1.5.97 2.52 0 3.6-2.19 4.39-4.28 4.62.34.29.64.86.64 1.74v2.58c0 .25.17.55.65.45A9.4 9.4 0 0 0 12 2.75z" />
+              </svg>
               <span>migaki-dev/migaki-whitepaper</span>
-              <span data-katex-version>KaTeX 0.17.0</span>
-            </div>
-            <div class="paper-viewport">
-              <p class="paper-status" id="whitepaper-status">Loading whitepaper source...</p>
-              <div class="paper-document" id="whitepaper-document"></div>
-            </div>
-          </article>
-        </div>
+            </a>
+            <a
+              class="paper-katex-link"
+              data-katex-version
+              href="https://www.npmjs.com/package/katex/v/0.17.0"
+            >KaTeX 0.17.0</a>
+          </div>
+          <div class="paper-viewport">
+            <p class="paper-status" id="whitepaper-status">Loading whitepaper source...</p>
+            <div class="paper-document" id="whitepaper-document"></div>
+          </div>
+        </article>
       </section>
     </main>
 
     <footer class="site-footer">
       <div class="site-footer-inner">
-        <span>Code: MIT</span>
-        <span>Content: CC BY 4.0</span>
-        <span>Brand assets require permission</span>
+        <span>Project code: <a href="https://github.com/migaki-dev/migaki/blob/main/LICENSE">Apache-2.0</a></span>
+        <span>Site code: <a href="https://github.com/migaki-dev/migaki-dev.github.io/blob/main/LICENSE-CODE">MIT</a></span>
+        <span>Content: <a href="https://github.com/migaki-dev/migaki-dev.github.io/blob/main/LICENSE-CONTENT">CC BY 4.0</a></span>
       </div>
     </footer>
 
     <script src="theme.js"></script>
-    <script type="module" src="whitepaper.js"></script>
+    <script type="module" src="whitepaper.js?v=20260628-6"></script>
   </body>
 </html>
