@@ -1,5 +1,6 @@
 const KATEX_VERSION = "0.17.0";
 const KATEX_URL = `https://cdn.jsdelivr.net/npm/katex@${KATEX_VERSION}/dist/katex.mjs`;
+const KATEX_PACKAGE_URL = `https://www.npmjs.com/package/katex/v/${KATEX_VERSION}`;
 const WHITEPAPER_BASE =
   "https://raw.githubusercontent.com/migaki-dev/migaki-whitepaper/main/paper/";
 const WHITEPAPER_MAIN_PATH = "main.tex";
@@ -29,7 +30,6 @@ const readerElement = document.querySelector(".whitepaper-reader");
 const katexVersionElement = document.querySelector("[data-katex-version]");
 
 let referenceIndex = new Map();
-let paginationTimer = 0;
 
 async function main() {
   if (!statusElement || !documentElement) {
@@ -39,6 +39,7 @@ async function main() {
   try {
     if (katexVersionElement) {
       katexVersionElement.textContent = `KaTeX ${KATEX_VERSION}`;
+      katexVersionElement.setAttribute("href", KATEX_PACKAGE_URL);
     }
 
     const [{ default: katex }, mainText] = await Promise.all([
@@ -70,9 +71,7 @@ async function main() {
 
     documentElement.replaceChildren(fragment);
     await document.fonts?.ready;
-    await nextFrame();
-    paginateDocument(documentElement);
-    window.addEventListener("resize", schedulePagination, { passive: true });
+    documentElement.classList.add("paper-flow");
     statusElement.remove();
     readerElement?.setAttribute("aria-busy", "false");
   } catch (error) {
@@ -393,9 +392,18 @@ function renderCenter(content, katex) {
     return element;
   }
 
-  for (const line of cleaned.split(/\\\\/).map((entry) => entry.trim()).filter(Boolean)) {
+  const lines = cleaned
+    .split("\n")
+    .map((entry) => entry.trim().replace(/\\\\\s*$/, "").trim())
+    .filter(Boolean);
+
+  for (const line of lines) {
+    if (/^\}+$/g.test(line)) {
+      continue;
+    }
+
     const row = document.createElement("div");
-    appendInline(row, line.replace(/^\}+|\}+$/g, ""), katex);
+    appendInline(row, line, katex);
     element.append(row);
   }
 
@@ -405,7 +413,7 @@ function renderCenter(content, katex) {
 function renderTable(content, katex) {
   const fragment = document.createDocumentFragment();
   const tableBody = extractTabularBody(content);
-  const captionMatch = content.match(/\\caption\{([^}]+)\}/);
+  const caption = extractCommandArgument(content, "caption");
 
   if (!tableBody) {
     const pre = document.createElement("pre");
@@ -441,11 +449,11 @@ function renderTable(content, katex) {
   scroll.append(table);
   fragment.append(scroll);
 
-  if (captionMatch) {
-    const caption = document.createElement("p");
-    caption.className = "paper-caption";
-    appendInline(caption, captionMatch[1], katex);
-    fragment.append(caption);
+  if (caption) {
+    const captionElement = document.createElement("p");
+    captionElement.className = "paper-caption";
+    appendInline(captionElement, caption, katex);
+    fragment.append(captionElement);
   }
 
   return fragment;
@@ -649,93 +657,6 @@ function escapeHtml(source) {
 
 function capitalize(source) {
   return source.charAt(0).toUpperCase() + source.slice(1);
-}
-
-function schedulePagination() {
-  window.clearTimeout(paginationTimer);
-  paginationTimer = window.setTimeout(() => paginateDocument(documentElement), 140);
-}
-
-function paginateDocument(root) {
-  const nodes = collectPaperNodes(root);
-  if (nodes.length === 0) {
-    return;
-  }
-
-  const pages = document.createElement("div");
-  pages.className = "paper-pages";
-  root.replaceChildren(pages);
-
-  let pageNumber = 1;
-  let current = createPaperPage(pages, pageNumber);
-
-  for (const node of nodes) {
-    current.flow.append(node);
-
-    if (current.page.scrollHeight <= current.page.clientHeight + 2) {
-      continue;
-    }
-
-    if (current.flow.children.length === 1) {
-      current.page.classList.add("paper-page--overflow");
-      pageNumber += 1;
-      current = createPaperPage(pages, pageNumber);
-      continue;
-    }
-
-    current.flow.removeChild(node);
-    pageNumber += 1;
-    current = createPaperPage(pages, pageNumber);
-    current.flow.append(node);
-
-    if (current.page.scrollHeight > current.page.clientHeight + 2) {
-      current.page.classList.add("paper-page--overflow");
-    }
-  }
-
-  if (current.flow.children.length === 0) {
-    current.page.remove();
-  }
-}
-
-function collectPaperNodes(root) {
-  const flow = root.querySelector(":scope > .paper-flow");
-  if (flow) {
-    return Array.from(flow.children);
-  }
-
-  const pageNodes = root.querySelectorAll(":scope .paper-page .paper-flow > *");
-  if (pageNodes.length > 0) {
-    return Array.from(pageNodes);
-  }
-
-  const initialFlow = document.createElement("div");
-  initialFlow.className = "paper-flow";
-  initialFlow.append(...Array.from(root.children));
-  root.replaceChildren(initialFlow);
-  return Array.from(initialFlow.children);
-}
-
-function createPaperPage(container, pageNumber) {
-  const page = document.createElement("section");
-  page.className = "paper-page";
-  page.setAttribute("aria-label", `Page ${pageNumber}`);
-
-  const flow = document.createElement("div");
-  flow.className = "paper-flow";
-  page.append(flow);
-
-  const number = document.createElement("span");
-  number.className = "paper-page-number";
-  number.textContent = String(pageNumber);
-  page.append(number);
-
-  container.append(page);
-  return { page, flow };
-}
-
-function nextFrame() {
-  return new Promise((resolve) => requestAnimationFrame(resolve));
 }
 
 main();
